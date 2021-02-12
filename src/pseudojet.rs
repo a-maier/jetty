@@ -48,6 +48,10 @@ impl PseudoJet {
         self.inv_pt2
     }
 
+    pub fn pt2(&self) -> N64  {
+        n64(1.)/self.inv_pt2
+    }
+
     fn init_pt2_phi_rap(&mut self) {
         let e = self[0];
         let px = self[1];
