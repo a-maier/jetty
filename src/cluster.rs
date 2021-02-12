@@ -17,10 +17,11 @@ pub fn cluster<D: Distance>(mut partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet
             i, i
         ))
     }
-    dists.sort_unstable_by(|a, b| b.cmp(a));
+
+    // TODO: test keeping distances sorted
 
     let mut jets = Vec::with_capacity(partons.len());
-    while let Some((_dist, i, j)) = dists.pop() {
+    while let Some(&(_, i, j)) = dists.iter().min() {
         if i == j {
             // closest is beam axis, this is already a jet
             dists.retain(|(_, ii, jj)| *ii != i && *jj != i);
@@ -58,8 +59,6 @@ pub fn cluster<D: Distance>(mut partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet
                 dists.push((d.distance(&pi, &pj), i, j));
             }
             dists.push((d.beam_distance(&pj), j, j));
-            // TODO: only sort new stuff and then merge
-            dists.sort_unstable_by(|a, b| b.cmp(a));
             partons.push(pj);
         }
     }
