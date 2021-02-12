@@ -71,7 +71,7 @@ where
             let (i, j) = minmax(i, j);
             debug_assert!(j > i);
             debug!("cluster pseudojets {} {}", i, j);
-            dists.retain(|(_, ii, jj)| *ii != i && *jj != i && *ii != j && *jj != j);
+            dists.retain(|(_, ii, jj)| *ii != j && *jj != j);
             let p2 = partons.swap_remove(j);
             for (_dist, ii, jj) in &mut dists {
                 if *ii == partons.len() {
@@ -81,23 +81,18 @@ where
                     *jj = j
                 }
             }
-            let p1 = partons.swap_remove(i);
-            for (_dist, ii, jj) in &mut dists {
-                if *ii == partons.len() {
-                    *ii = i
-                }
-                if *jj == partons.len() {
-                    *jj = i
-                }
+            partons[i] += p2;
+            // update distances
+            let affected_dists = dists.iter_mut()
+                .filter(|(_dist, ii, jj)| *ii == i || *jj == i);
+            for (dist, ii, jj) in affected_dists {
+                *dist = if ii != jj {
+                    d.distance(&partons[*ii], &partons[*jj])
+                } else {
+                    d.beam_distance(&partons[i])
+                };
             }
-            let pj = p1 + p2;
-            let j = partons.len();
-            for (i, pi) in partons.iter().copied().enumerate() {
-                dists.push((d.distance(&pi, &pj), i, j));
-            }
-            dists.push((d.beam_distance(&pj), j, j));
             trace!("distances: {:#?}", dists);
-            partons.push(pj);
         }
     }
     debug!("final jets: {:#?}", jets);
