@@ -7,6 +7,8 @@ use noisy_float::prelude::*;
 
 pub const D: usize = 4;
 
+/// Pseudojet
+/// A pseudojet is a particle momentum or a sum of momenta of clustered particles
 #[derive(Copy,Clone,Eq,PartialEq,Ord,PartialOrd,Hash,Debug)]
 pub struct PseudoJet {
     comp: [N64; D],
@@ -16,38 +18,47 @@ pub struct PseudoJet {
 }
 
 impl PseudoJet {
+    /// Create pseudojet with vanishing four-momentum
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Energy
     pub fn e(&self) -> N64 {
         self[0]
     }
 
+    /// Momentum in x direction
     pub fn px(&self) -> N64  {
         self[1]
     }
 
+    /// Momentum in y direction
     pub fn py(&self) -> N64  {
         self[2]
     }
 
+    /// Momentum in z direction, i.e. along the beam axis
     pub fn pz(&self) -> N64  {
         self[3]
     }
 
+    /// Azimuthal angle
     pub fn phi(&self) -> N64 {
         self.phi
     }
 
+    /// Rapidity
     pub fn rap(&self) -> N64  {
         self.rap
     }
 
+    /// Inverse square of transverse momentum inv_pt2 = 1/pt2
     pub fn inv_pt2(&self) -> N64  {
         self.inv_pt2
     }
 
+    /// Square of transverse momentum pt2 = px*px + py*py
     pub fn pt2(&self) -> N64  {
         n64(1.)/self.inv_pt2
     }
@@ -88,6 +99,7 @@ impl PseudoJet {
     }
 }
 
+/// Create a pseudojet from the four-momentum components
 impl From<[N64; D]> for PseudoJet {
     fn from(arr: [N64; D]) -> Self {
         let mut res = Self::new();
@@ -97,6 +109,18 @@ impl From<[N64; D]> for PseudoJet {
     }
 }
 
+/// Create a pseudojet from the four-momentum components
+impl From<[f64; D]> for PseudoJet {
+    fn from(arr: [f64; D]) -> Self {
+        let mut arr_n64 = [n64(0.); D];
+        for i in 0..D {
+            arr_n64[i] = n64(arr[i])
+        }
+        arr_n64.into()
+    }
+}
+
+/// Create a pseudojet from the four-momentum components
 impl From<(N64, N64, N64, N64)> for PseudoJet {
     fn from(p: (N64, N64, N64, N64)) -> Self {
         let mut res = Self::new();
@@ -107,8 +131,22 @@ impl From<(N64, N64, N64, N64)> for PseudoJet {
     }
 }
 
+/// Create a pseudojet from the four-momentum components
+impl From<(f64, f64, f64, f64)> for PseudoJet {
+    fn from(p: (f64, f64, f64, f64)) -> Self {
+        let (e, px, py, pz) = p;
+        [n64(e), n64(px), n64(py), n64(pz)].into()
+    }
+}
+
+/// Create a pseudojet from the four-momentum components
 pub fn pseudojet(e: N64, px: N64, py: N64, pz: N64) -> PseudoJet {
     [e, px, py, pz].into()
+}
+
+/// Create a pseudojet from the four-momentum components
+pub fn pseudojet_f(e: f64, px: f64, py: f64, pz: f64) -> PseudoJet {
+    pseudojet(n64(e), n64(px), n64(py), n64(pz))
 }
 
 impl Default for PseudoJet {

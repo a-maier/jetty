@@ -1,6 +1,7 @@
 use crate::pseudojet::PseudoJet;
 use crate::distance::Distance;
 
+// Cluster `partons` into jets using the distance measure `d`
 pub fn cluster<D: Distance>(mut partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet> {
     let n = partons.len();
 
