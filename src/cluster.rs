@@ -29,6 +29,7 @@ where
     D: Distance,
     F: FnMut(PseudoJet) -> bool
 {
+    debug!("clustering partons: {:#?}", partons);
     let n = partons.len();
 
     let mut dists = Vec::with_capacity((n * (n + 1))/2);
@@ -60,7 +61,7 @@ where
                     *ii = i
                 }
                 if *jj == partons.len() {
-                    *jj = i;
+                    *jj = i
                 }
             }
             trace!("distances: {:#?}", dists);
@@ -69,23 +70,27 @@ where
             // combine into new pseudojet
             let (i, j) = minmax(i, j);
             debug_assert!(j > i);
+            debug!("cluster pseudojets {} {}", i, j);
             dists.retain(|(_, ii, jj)| *ii != i && *jj != i && *ii != j && *jj != j);
             let p2 = partons.swap_remove(j);
+            for (_dist, ii, jj) in &mut dists {
+                if *ii == partons.len() {
+                    *ii = j
+                }
+                if *jj == partons.len() {
+                    *jj = j
+                }
+            }
             let p1 = partons.swap_remove(i);
             for (_dist, ii, jj) in &mut dists {
                 if *ii == partons.len() {
-                    *ii = i;
-                } else if *ii == partons.len() + 1 {
-                    *ii = j;
+                    *ii = i
                 }
                 if *jj == partons.len() {
-                    *jj = i;
-                } else if *jj == partons.len() + 1 {
-                    *jj = j;
+                    *jj = i
                 }
             }
             let pj = p1 + p2;
-            debug!("cluster pseudojets {} {}", i, j);
             let j = partons.len();
             for (i, pi) in partons.iter().copied().enumerate() {
                 dists.push((d.distance(&pi, &pj), i, j));
@@ -95,5 +100,6 @@ where
             partons.push(pj);
         }
     }
+    debug!("final jets: {:#?}", jets);
     jets
 }
