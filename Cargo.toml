@@ -14,3 +14,7 @@ repository = "https://github.com/a-maier/jetty"
 
 [dependencies]
 noisy_float = "0.1"
+log = "0.4"
+
+[dev-dependencies]
+env_logger = "0.7"
