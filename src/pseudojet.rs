@@ -7,7 +7,6 @@ use noisy_float::prelude::*;
 
 pub const D: usize = 4;
 
-/// Pseudojet
 /// A pseudojet is a particle momentum or a sum of momenta of clustered particles
 #[derive(Copy,Clone,Eq,PartialEq,Ord,PartialOrd,Hash,Debug)]
 pub struct PseudoJet {
@@ -85,17 +84,11 @@ impl PseudoJet {
             self.phi -= n64(2.)*PI;
         }
 
-        self.rap = if e == 0. {
-            if pz == 0. {
-                n64(0.)
-            } else {
-                let rat = e/pz;
-                ((rat + 1.)/(rat - 1.)).ln()/2.
-            }
+        self.rap = if e == 0. && pz == 0. {
+            n64(0.)
         } else {
-            let rat = pz/e;
-            ((rat + 1.)/(n64(1.) - rat)).ln()/2.
-        };
+            ((e + pz)/(e - pz)).ln()/2.
+        }
     }
 }
 
