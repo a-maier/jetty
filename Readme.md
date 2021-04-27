@@ -1,5 +1,7 @@
 # jetty
 
+## jetty
+
 Implementations of common inclusive jet clustering algorithms.
 
 In the current version, the following distance measures are implemented:
@@ -13,7 +15,7 @@ This crate uses a naive clustering implementation. For
 state-of-the-art implementations of many more jet algorithms, have a
 look at the excellent [fastjet](http://fastjet.fr/) library.
 
-# Examples
+## Examples
 
 Cluster a number of partons into jets using the anti-kt algorithm with radius 0.4:
 
@@ -33,7 +35,9 @@ assert_eq!(all_jets.len(), 1);
 let jets_40gev = cluster_if(
    partons.clone(),
    &anti_kt_f(0.4),
-   |jet| jet.pt2() > 20.
+   |jet| jet.pt2() > 40. * 40.
 );
 assert_eq!(jets_40gev.len(), 0);
 ```
+
+License: GPL-3.0-or-later

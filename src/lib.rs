@@ -33,7 +33,7 @@
 //! let jets_40gev = cluster_if(
 //!    partons.clone(),
 //!    &anti_kt_f(0.4),
-//!    |jet| jet.pt2() > 20.
+//!    |jet| jet.pt2() > 40. * 40.
 //! );
 //! assert_eq!(jets_40gev.len(), 0);
 //! ```
