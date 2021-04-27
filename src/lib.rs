@@ -1,5 +1,3 @@
-//! # jetty
-//!
 //! Implementations of common inclusive jet clustering algorithms.
 //!
 //! In the current version, the following distance measures are implemented:
