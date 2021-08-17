@@ -1,6 +1,6 @@
 [package]
 name = "jetty"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Andreas Maier <andreas.martin.maier@desy.de>"]
 edition = "2018"
 description = "Jet clustering"
