@@ -128,3 +128,13 @@ impl Distance for GenKt {
         p1.pt2().powf(self.p)
     }
 }
+
+impl<T: Distance> Distance for &T {
+    fn distance(&self, p1: &PseudoJet, p2: &PseudoJet) -> N64 {
+        (*self).distance(p1, p2)
+    }
+
+    fn beam_distance(&self, p1: &PseudoJet) -> N64 {
+         (*self).beam_distance(p1)
+    }
+}
