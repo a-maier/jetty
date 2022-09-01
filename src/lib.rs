@@ -43,7 +43,7 @@ pub mod cluster;
 pub use pseudojet::{PseudoJet, pseudojet, pseudojet_f};
 pub use distance::{anti_kt, kt, gen_kt, cambridge_aachen};
 pub use distance::{anti_kt_f, kt_f, gen_kt_f, cambridge_aachen_f};
-pub use cluster::{cluster, cluster_if, ClusterHistory};
+pub use cluster::{cluster, cluster_if, ClusterHistory, ClusterStep};
 
 #[cfg(test)]
 mod tests {
