@@ -52,12 +52,12 @@ impl PseudoJet {
         self.rap
     }
 
-    /// Inverse square of transverse momentum inv_pt2 = 1/pt2
+    /// Inverse square of transverse momentum `inv_pt2 = 1/pt2`
     pub fn inv_pt2(&self) -> N64  {
         self.inv_pt2
     }
 
-    /// Square of transverse momentum pt2 = px*px + py*py
+    /// Square of transverse momentum `pt2 = px*px + py*py`
     pub fn pt2(&self) -> N64  {
         n64(1.)/self.inv_pt2
     }
