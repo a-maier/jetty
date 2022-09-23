@@ -13,12 +13,12 @@ pub trait Distance {
 }
 
 pub struct AntiKt {
-    r2: N64
+    r2: N64,
 }
 
 /// anti-kt distance measure with radius parameter `r`
 pub fn anti_kt(r: N64) -> AntiKt {
-    AntiKt{r2: r*r}
+    AntiKt { r2: r * r }
 }
 
 /// anti-kt distance measure with radius parameter `r`
@@ -31,9 +31,9 @@ impl Distance for AntiKt {
         let dy = p1.rap() - p2.rap();
         let dphi = p1.phi() - p2.phi();
 
-        let delta_sq = dy*dy + dphi*dphi;
+        let delta_sq = dy * dy + dphi * dphi;
 
-        min(p1.inv_pt2(), p2.inv_pt2()) * delta_sq/self.r2
+        min(p1.inv_pt2(), p2.inv_pt2()) * delta_sq / self.r2
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
@@ -42,12 +42,12 @@ impl Distance for AntiKt {
 }
 
 pub struct Kt {
-    r2: N64
+    r2: N64,
 }
 
 /// kt distance measure with radius parameter `r`
 pub fn kt(r: N64) -> Kt {
-    Kt{r2: r*r}
+    Kt { r2: r * r }
 }
 
 /// kt distance measure with radius parameter `r`
@@ -60,9 +60,9 @@ impl Distance for Kt {
         let dy = p1.rap() - p2.rap();
         let dphi = p1.phi() - p2.phi();
 
-        let delta_sq = dy*dy + dphi*dphi;
+        let delta_sq = dy * dy + dphi * dphi;
 
-        min(p1.pt2(), p2.pt2()) * delta_sq/self.r2
+        min(p1.pt2(), p2.pt2()) * delta_sq / self.r2
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
@@ -71,12 +71,12 @@ impl Distance for Kt {
 }
 
 pub struct CambridgeAachen {
-    r2: N64
+    r2: N64,
 }
 
 /// Cambridge/Aachen distance measure with radius parameter `r`
 pub fn cambridge_aachen(r: N64) -> CambridgeAachen {
-    CambridgeAachen{r2: r*r}
+    CambridgeAachen { r2: r * r }
 }
 
 /// Cambridge/Aachen distance measure with radius parameter `r`
@@ -89,9 +89,9 @@ impl Distance for CambridgeAachen {
         let dy = p1.rap() - p2.rap();
         let dphi = p1.phi() - p2.phi();
 
-        let delta_sq = dy*dy + dphi*dphi;
+        let delta_sq = dy * dy + dphi * dphi;
 
-        delta_sq/self.r2
+        delta_sq / self.r2
     }
 
     fn beam_distance(&self, _p1: &PseudoJet) -> N64 {
@@ -106,7 +106,7 @@ pub struct GenKt {
 
 /// Generalised kt distance measure with radius parameter `r` and exponent `p`
 pub fn gen_kt(r: N64, p: N64) -> GenKt {
-    GenKt{r2: r*r, p}
+    GenKt { r2: r * r, p }
 }
 
 /// Generalised kt distance measure with radius parameter `r` and exponent `p`
@@ -119,9 +119,9 @@ impl Distance for GenKt {
         let dy = p1.rap() - p2.rap();
         let dphi = p1.phi() - p2.phi();
 
-        let delta_sq = dy*dy + dphi*dphi;
+        let delta_sq = dy * dy + dphi * dphi;
 
-        min(p1.pt2().powf(self.p), p2.pt2().powf(self.p)) * delta_sq/self.r2
+        min(p1.pt2().powf(self.p), p2.pt2().powf(self.p)) * delta_sq / self.r2
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
@@ -135,6 +135,6 @@ impl<T: Distance> Distance for &T {
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
-         (*self).beam_distance(p1)
+        (*self).beam_distance(p1)
     }
 }

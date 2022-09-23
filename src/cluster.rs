@@ -1,5 +1,5 @@
-use crate::pseudojet::PseudoJet;
 use crate::distance::Distance;
+use crate::pseudojet::PseudoJet;
 
 use std::cmp::Ord;
 
@@ -24,19 +24,21 @@ pub fn cluster<D: Distance>(partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet> {
 pub fn cluster_if<D, F>(
     partons: Vec<PseudoJet>,
     d: &D,
-    mut accept: F
+    mut accept: F,
 ) -> Vec<PseudoJet>
 where
     D: Distance,
-    F: FnMut(PseudoJet) -> bool
+    F: FnMut(PseudoJet) -> bool,
 {
     debug!("clustering partons: {:#?}", partons);
     let clustering = ClusterHistory::new(partons, d);
 
-    clustering.filter_map(|s| match s {
-        ClusterStep::Jet(jet) if accept(jet) => Some(jet),
-        _ => None
-    }).collect()
+    clustering
+        .filter_map(|s| match s {
+            ClusterStep::Jet(jet) if accept(jet) => Some(jet),
+            _ => None,
+        })
+        .collect()
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -89,14 +91,14 @@ impl<D: Distance> ClusterHistory<D> {
         }
         self.pseudojets[i] += p2;
         // update distances
-        let affected_dists = self.distances.iter_mut()
+        let affected_dists = self
+            .distances
+            .iter_mut()
             .filter(|(_dist, ii, jj)| *ii == i || *jj == i);
         for (dist, ii, jj) in affected_dists {
             *dist = if ii != jj {
-                self.distance.distance(
-                    &self.pseudojets[*ii],
-                    &self.pseudojets[*jj]
-                )
+                self.distance
+                    .distance(&self.pseudojets[*ii], &self.pseudojets[*jj])
             } else {
                 self.distance.beam_distance(&self.pseudojets[i])
             };
@@ -142,22 +144,16 @@ impl From<PseudoJet> for ClusterStep {
 
 fn calc_distances<D: Distance>(
     pseudojets: &[PseudoJet],
-    d: &D
+    d: &D,
 ) -> Vec<(N64, usize, usize)> {
     let n = pseudojets.len();
 
-    let mut dists = Vec::with_capacity((n * (n + 1))/2);
+    let mut dists = Vec::with_capacity((n * (n + 1)) / 2);
     for i in 0..n {
-        for j in i+1..n {
-            dists.push((
-                d.distance(&pseudojets[i], &pseudojets[j]),
-                i, j
-            ));
+        for j in i + 1..n {
+            dists.push((d.distance(&pseudojets[i], &pseudojets[j]), i, j));
         }
-        dists.push((
-            d.beam_distance(&pseudojets[i]),
-            i, i
-        ))
+        dists.push((d.beam_distance(&pseudojets[i]), i, i))
     }
     trace!("distances: {:#?}", dists);
     dists

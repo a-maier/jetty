@@ -1,14 +1,14 @@
 use std::convert::From;
 use std::default::Default;
-use std::ops::{Add, AddAssign, Sub, SubAssign, Index};
 use std::f64::consts::PI;
+use std::ops::{Add, AddAssign, Index, Sub, SubAssign};
 
 use noisy_float::prelude::*;
 
 pub const D: usize = 4;
 
 /// A pseudojet is a particle momentum or a sum of momenta of clustered particles
-#[derive(Copy,Clone,Eq,PartialEq,Ord,PartialOrd,Hash,Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct PseudoJet {
     comp: [N64; D],
     inv_pt2: N64,
@@ -28,17 +28,17 @@ impl PseudoJet {
     }
 
     /// Momentum in x direction
-    pub fn px(&self) -> N64  {
+    pub fn px(&self) -> N64 {
         self[1]
     }
 
     /// Momentum in y direction
-    pub fn py(&self) -> N64  {
+    pub fn py(&self) -> N64 {
         self[2]
     }
 
     /// Momentum in z direction, i.e. along the beam axis
-    pub fn pz(&self) -> N64  {
+    pub fn pz(&self) -> N64 {
         self[3]
     }
 
@@ -48,18 +48,18 @@ impl PseudoJet {
     }
 
     /// Rapidity
-    pub fn rap(&self) -> N64  {
+    pub fn rap(&self) -> N64 {
         self.rap
     }
 
     /// Inverse square of transverse momentum `inv_pt2 = 1/pt2`
-    pub fn inv_pt2(&self) -> N64  {
+    pub fn inv_pt2(&self) -> N64 {
         self.inv_pt2
     }
 
     /// Square of transverse momentum `pt2 = px*px + py*py`
-    pub fn pt2(&self) -> N64  {
-        n64(1.)/self.inv_pt2
+    pub fn pt2(&self) -> N64 {
+        n64(1.) / self.inv_pt2
     }
 
     fn init_pt2_phi_rap(&mut self) {
@@ -69,25 +69,21 @@ impl PseudoJet {
         let pz = self[3];
 
         // initialisation taken from fastjet
-        let pt2 = px*px + py*py;
+        let pt2 = px * px + py * py;
         self.inv_pt2 = n64(1.) / pt2;
 
-        self.phi = if pt2 > 0. {
-            py.atan2(px)
-        } else {
-            n64(0.)
-        };
+        self.phi = if pt2 > 0. { py.atan2(px) } else { n64(0.) };
         if self.phi < 0. {
-            self.phi += n64(2.)*PI;
+            self.phi += n64(2.) * PI;
         }
-        if self.phi > n64(2.)*PI {
-            self.phi -= n64(2.)*PI;
+        if self.phi > n64(2.) * PI {
+            self.phi -= n64(2.) * PI;
         }
 
         self.rap = if e == 0. && pz == 0. {
             n64(0.)
         } else {
-            ((e + pz)/(e - pz)).ln()/2.
+            ((e + pz) / (e - pz)).ln() / 2.
         }
     }
 }
