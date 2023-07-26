@@ -41,6 +41,7 @@ where
         .collect()
 }
 
+/// Cluster history using naive brute-force nearest-neighbour search
 #[derive(Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct ClusterHistory<D> {
     pseudojets: Vec<PseudoJet>,
@@ -49,6 +50,7 @@ pub struct ClusterHistory<D> {
 }
 
 impl<D: Distance> ClusterHistory<D> {
+    /// Initialise clustering for the given `partons` and `distance`
     pub fn new(partons: Vec<PseudoJet>, distance: D) -> Self {
         let distances = calc_distances(&partons, &distance);
         Self {
@@ -111,6 +113,7 @@ impl<D: Distance> ClusterHistory<D> {
 impl<D: Distance> Iterator for ClusterHistory<D> {
     type Item = ClusterStep;
 
+    /// Perform the next clustering step
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(&(_, i, j)) = self.distances.iter().min() {
             if i == j {
@@ -124,9 +127,12 @@ impl<D: Distance> Iterator for ClusterHistory<D> {
     }
 }
 
+/// Result of a clustering step
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum ClusterStep {
+    /// Two pseudojets were combined into a new pseudojet
     Combine([PseudoJet; 2]),
+    /// A jet was found
     Jet(PseudoJet),
 }
 
