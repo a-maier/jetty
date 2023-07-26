@@ -31,7 +31,7 @@ where
     F: FnMut(PseudoJet) -> bool,
 {
     debug!("clustering partons: {:#?}", partons);
-    let clustering = ClusterHistory::new(partons, d);
+    let clustering = ClusterNaive::new(partons, d);
 
     clustering
         .filter_map(|s| match s {
@@ -43,13 +43,13 @@ where
 
 /// Cluster history using naive brute-force nearest-neighbour search
 #[derive(Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct ClusterHistory<D> {
+pub struct ClusterNaive<D> {
     pseudojets: Vec<PseudoJet>,
     distance: D,
     distances: Vec<(N64, usize, usize)>,
 }
 
-impl<D: Distance> ClusterHistory<D> {
+impl<D: Distance> ClusterNaive<D> {
     /// Initialise clustering for the given `partons` and `distance`
     pub fn new(partons: Vec<PseudoJet>, distance: D) -> Self {
         let distances = calc_distances(&partons, &distance);
@@ -110,7 +110,7 @@ impl<D: Distance> ClusterHistory<D> {
     }
 }
 
-impl<D: Distance> Iterator for ClusterHistory<D> {
+impl<D: Distance> Iterator for ClusterNaive<D> {
     type Item = ClusterStep;
 
     /// Perform the next clustering step

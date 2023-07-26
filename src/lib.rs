@@ -40,7 +40,7 @@ pub mod cluster;
 pub mod distance;
 pub mod pseudojet;
 
-pub use cluster::{cluster, cluster_if, ClusterHistory, ClusterStep};
+pub use cluster::{cluster, cluster_if, ClusterNaive, ClusterStep};
 pub use distance::{anti_kt, cambridge_aachen, gen_kt, kt};
 pub use distance::{anti_kt_f, cambridge_aachen_f, gen_kt_f, kt_f};
 pub use pseudojet::{pseudojet, pseudojet_f, PseudoJet};
