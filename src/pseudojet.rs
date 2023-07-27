@@ -42,12 +42,12 @@ impl PseudoJet {
         self[3]
     }
 
-    /// Azimuthal angle
+    /// Azimuthal angle φ
     pub fn phi(&self) -> N64 {
         self.phi
     }
 
-    /// Rapidity
+    /// Rapidity η
     pub fn rap(&self) -> N64 {
         self.rap
     }
@@ -60,6 +60,48 @@ impl PseudoJet {
     /// Square of transverse momentum `pt2 = px*px + py*py`
     pub fn pt2(&self) -> N64 {
         n64(1.) / self.inv_pt2
+    }
+
+    /// Calculate ΔR^2 = Δφ^2 + Δη^2
+    pub fn delta_r2(&self, p: &PseudoJet) -> N64 {
+        self.delta_phi2(p) + self.delta_rap2(p)
+    }
+
+    /// Calculate ΔR = (Δφ^2 + Δη^2)^(1/2)
+    pub fn delta_r(&self, p: &PseudoJet) -> N64 {
+        self.delta_r2(p).sqrt()
+    }
+
+    /// Square Δφ^2 of azimuthal angle difference
+    pub fn delta_phi2(&self, p: &PseudoJet) -> N64 {
+        let dphi = self.delta_phi(p);
+        dphi * dphi
+    }
+
+    /// Difference Δφ in azimuthal angle
+    ///
+    /// The difference is normalised such that -π < Δφ <= π
+    pub fn delta_phi(&self, p: &PseudoJet) -> N64 {
+        let mut dphi = self.phi() - p.phi();
+        if dphi > PI {
+            dphi -= 2. * PI;
+        } else if dphi <= -PI {
+            dphi += 2. * PI;
+        }
+        debug_assert!(dphi > -PI);
+        debug_assert!(dphi <= PI);
+        dphi
+    }
+
+    /// Square Δφ^2 of azimuthal angle difference
+    pub fn delta_rap2(&self, p: &PseudoJet) -> N64 {
+        let drap = self.delta_rap(p);
+        drap * drap
+    }
+
+    /// Difference Δη in rapidity
+    pub fn delta_rap(&self, p: &PseudoJet) -> N64 {
+        self.rap() - p.rap()
     }
 
     fn init_pt2_phi_rap(&mut self) {
@@ -86,6 +128,7 @@ impl PseudoJet {
             ((e + pz) / (e - pz)).ln() / 2.
         }
     }
+
 }
 
 /// Create a pseudojet from the four-momentum components

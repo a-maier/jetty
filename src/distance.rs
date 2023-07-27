@@ -1,6 +1,6 @@
 use crate::pseudojet::PseudoJet;
 
-use std::{cmp::min, f64::consts::PI};
+use std::cmp::min;
 
 use noisy_float::prelude::*;
 
@@ -28,12 +28,7 @@ pub fn anti_kt_f(r: f64) -> AntiKt {
 
 impl Distance for AntiKt {
     fn distance(&self, p1: &PseudoJet, p2: &PseudoJet) -> N64 {
-        let dy = p1.rap() - p2.rap();
-        let dphi = delta_phi(p1, p2);
-
-        let delta_sq = dy * dy + dphi * dphi;
-
-        min(p1.inv_pt2(), p2.inv_pt2()) * delta_sq / self.r2
+        min(p1.inv_pt2(), p2.inv_pt2()) * p1.delta_r2(p2) / self.r2
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
@@ -57,12 +52,7 @@ pub fn kt_f(r: f64) -> Kt {
 
 impl Distance for Kt {
     fn distance(&self, p1: &PseudoJet, p2: &PseudoJet) -> N64 {
-        let dy = p1.rap() - p2.rap();
-        let dphi = delta_phi(p1, p2);
-
-        let delta_sq = dy * dy + dphi * dphi;
-
-        min(p1.pt2(), p2.pt2()) * delta_sq / self.r2
+        min(p1.pt2(), p2.pt2()) * p1.delta_r2(p2) / self.r2
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
@@ -86,12 +76,7 @@ pub fn cambridge_aachen_f(r: f64) -> CambridgeAachen {
 
 impl Distance for CambridgeAachen {
     fn distance(&self, p1: &PseudoJet, p2: &PseudoJet) -> N64 {
-        let dy = p1.rap() - p2.rap();
-        let dphi = delta_phi(p1, p2);
-
-        let delta_sq = dy * dy + dphi * dphi;
-
-        delta_sq / self.r2
+        p1.delta_r2(p2) / self.r2
     }
 
     fn beam_distance(&self, _p1: &PseudoJet) -> N64 {
@@ -116,12 +101,7 @@ pub fn gen_kt_f(r: f64, p: f64) -> GenKt {
 
 impl Distance for GenKt {
     fn distance(&self, p1: &PseudoJet, p2: &PseudoJet) -> N64 {
-        let dy = p1.rap() - p2.rap();
-        let dphi = delta_phi(p1, p2);
-
-        let delta_sq = dy * dy + dphi * dphi;
-
-        min(p1.pt2().powf(self.p), p2.pt2().powf(self.p)) * delta_sq / self.r2
+        min(p1.pt2().powf(self.p), p2.pt2().powf(self.p)) * p1.delta_r2(p2) / self.r2
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
@@ -137,16 +117,4 @@ impl<T: Distance> Distance for &T {
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {
         (*self).beam_distance(p1)
     }
-}
-
-fn delta_phi(p1: &PseudoJet, p2: &PseudoJet) -> N64 {
-    let mut dphi = p1.phi() - p2.phi();
-    if dphi > PI {
-        dphi -= 2. * PI;
-    } else if dphi < -PI {
-        dphi += 2. * PI;
-    }
-    debug_assert!(dphi >= -PI);
-    debug_assert!(dphi <= PI);
-    dphi
 }
