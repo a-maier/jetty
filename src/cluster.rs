@@ -1,3 +1,4 @@
+use crate::cluster_geom::ClusterGeom;
 use crate::{distance::Distance, cluster_naive::ClusterNaive};
 use crate::pseudojet::PseudoJet;
 
@@ -14,7 +15,7 @@ pub fn cluster<D: Distance>(partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet> {
 /// Only jets for which `accept` is true are returned
 pub fn cluster_if<D, F>(
     partons: Vec<PseudoJet>,
-    d: &D,
+    d: D,
     mut accept: F,
 ) -> Vec<PseudoJet>
 where
@@ -22,7 +23,7 @@ where
     F: FnMut(PseudoJet) -> bool,
 {
     debug!("clustering partons: {:#?}", partons);
-    let clustering = ClusterNaive::new(partons, d);
+    let clustering = ClusterHistory::new(partons, d);
 
     clustering
         .filter_map(|s| match s {
@@ -70,3 +71,31 @@ impl Eq for ClusterStep { }
 pub trait ClusterHist: Iterator<Item = ClusterStep>{}
 
 impl<T> ClusterHist for T where T: Iterator<Item = ClusterStep> { }
+
+/// General-purpose cluster history
+pub struct ClusterHistory<'a> (
+    Box<dyn ClusterHist + 'a>
+);
+
+impl<'a> ClusterHistory<'a> {
+    const NAIVE_THRESHOLD: usize = 20;
+
+    /// Initialise clustering for the given `partons` and `distance`
+    pub fn new<D: Distance + 'a>(partons: Vec<PseudoJet>, distance: D) -> Self {
+        let hist: Box<dyn ClusterHist> = if partons.len() > Self::NAIVE_THRESHOLD {
+            Box::new(ClusterGeom::new(partons, distance))
+        } else {
+            Box::new(ClusterNaive::new(partons, distance))
+        };
+        Self(hist)
+    }
+}
+
+impl<'a> Iterator for ClusterHistory<'a> {
+    type Item = ClusterStep;
+
+    /// Perform the next clustering step
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next()
+    }
+}
