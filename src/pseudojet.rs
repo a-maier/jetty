@@ -74,7 +74,7 @@ impl PseudoJet {
 
     /// Square Δφ^2 of azimuthal angle difference
     pub fn delta_phi2(&self, p: &PseudoJet) -> N64 {
-        let dphi = self.delta_phi(p);
+        let dphi = self.delta_phi_abs(p);
         dphi * dphi
     }
 
@@ -91,6 +91,19 @@ impl PseudoJet {
         debug_assert!(dphi > -PI);
         debug_assert!(dphi <= PI);
         dphi
+    }
+
+    /// Absolute difference |Δφ| in azimuthal angle
+    ///
+    /// The difference is normalised such that 0 <= |Δφ| <= π
+    pub fn delta_phi_abs(&self, p: &PseudoJet) -> N64 {
+        let mut abs_dphi = (self.phi() - p.phi()).abs();
+        if abs_dphi > PI {
+            abs_dphi = n64(2. * PI - f64::from(abs_dphi));
+        }
+        debug_assert!(abs_dphi >= 0.);
+        debug_assert!(abs_dphi <= PI);
+        abs_dphi
     }
 
     /// Square Δφ^2 of azimuthal angle difference
