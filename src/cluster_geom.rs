@@ -256,7 +256,7 @@ impl Ord for PseudoJetWithDist {
 
 #[cfg(test)]
 mod tests {
-    use crate::{test_data::*, ClusterNaive, anti_kt_f};
+    use crate::{test_data::*, cluster_naive::ClusterNaive, anti_kt_f};
 
     use super::*;
 

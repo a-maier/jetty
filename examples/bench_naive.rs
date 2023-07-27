@@ -2,7 +2,7 @@ use std::{fs::File, time::Duration};
 
 use anyhow::Result;
 use cpu_time::ProcessTime;
-use jetty::{PseudoJet, anti_kt_f, ClusterStep, ClusterNaive};
+use jetty::{PseudoJet, anti_kt_f, ClusterStep, cluster_naive::ClusterNaive};
 
 fn main() -> Result<()> {
     let input = File::open("data/momenta_showered.rmp.zst")?;
