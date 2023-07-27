@@ -12,9 +12,6 @@ fn main() -> Result<()> {
     zstd::stream::copy_decode(input, &mut events).unwrap();
     let events: Vec<Vec<[f64; 4]>> = rmp_serde::from_slice(&events)?;
 
-    let min_nparton = events.iter().map(|ev| ev.len()).min().unwrap();
-    println!("Found at least {min_nparton} partons");
-
     let events: Vec<Vec<PseudoJet>> = events.into_iter().map(
         |ev| ev.into_iter().map(|p| p.into()).collect()
     ).collect();
