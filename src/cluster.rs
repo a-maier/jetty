@@ -66,3 +66,7 @@ impl PartialEq for ClusterStep {
 }
 
 impl Eq for ClusterStep { }
+
+pub trait ClusterHist: Iterator<Item = ClusterStep>{}
+
+impl<T> ClusterHist for T where T: Iterator<Item = ClusterStep> { }
