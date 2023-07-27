@@ -37,6 +37,7 @@
 //! ```
 
 pub mod cluster;
+pub mod cluster_geom;
 pub mod distance;
 pub mod pseudojet;
 

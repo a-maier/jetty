@@ -128,7 +128,7 @@ impl<D: Distance> Iterator for ClusterNaive<D> {
 }
 
 /// Result of a clustering step
-#[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Clone, Debug, Ord, PartialOrd, Hash)]
 pub enum ClusterStep {
     /// Two pseudojets were combined into a new pseudojet
     Combine([PseudoJet; 2]),
@@ -147,6 +147,20 @@ impl From<PseudoJet> for ClusterStep {
         Self::Jet(jet)
     }
 }
+
+impl PartialEq for ClusterStep {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Combine(left), Self::Combine(right)) => left == right || (
+                (&left[0] == &right[1]) && (&left[1] == &right[0])
+            ),
+            (Self::Jet(l0), Self::Jet(r0)) => l0 == r0,
+            _ => false,
+        }
+    }
+}
+
+impl Eq for ClusterStep { }
 
 fn calc_distances<D: Distance>(
     pseudojets: &[PseudoJet],
