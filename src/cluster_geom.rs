@@ -134,6 +134,8 @@ impl<D: Distance> ClusterGeom<D> {
                 &self.pseudojets[pos],
                 &self.pseudojets[nearest_idx]
             );
+        } else {
+            self.pseudojets[pos].nearest_dist = N64::max_value()
         }
     }
 
