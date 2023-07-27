@@ -39,6 +39,8 @@ impl<D: Distance> ClusterGeom<D> {
                     &pseudojets[nearest_idx].pseudojet
                 );
                 pseudojets[nearest_idx].nearest_neighbour_for.push(i);
+            } else {
+                pseudojets[i].nearest_dist = N64::max_value();
             }
         }
         Self {
