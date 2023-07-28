@@ -144,6 +144,16 @@ impl PseudoJet {
 
 }
 
+macro_rules! forward_ref_from {
+    ($from:ty, $to:ty) => {
+        impl From<&$from> for $to {
+            fn from(from: &$from) -> Self {
+                Self::from(*from)
+            }
+        }
+    };
+}
+
 /// Create a pseudojet from the four-momentum components
 impl From<[N64; D]> for PseudoJet {
     fn from(arr: [N64; D]) -> Self {
@@ -153,6 +163,8 @@ impl From<[N64; D]> for PseudoJet {
         res
     }
 }
+
+forward_ref_from!([N64; D], PseudoJet);
 
 /// Create a pseudojet from the four-momentum components
 impl From<[f64; D]> for PseudoJet {
@@ -165,16 +177,17 @@ impl From<[f64; D]> for PseudoJet {
     }
 }
 
+forward_ref_from!([f64; D], PseudoJet);
+
 /// Create a pseudojet from the four-momentum components
 impl From<(N64, N64, N64, N64)> for PseudoJet {
     fn from(p: (N64, N64, N64, N64)) -> Self {
-        let mut res = Self::new();
         let (e, px, py, pz) = p;
-        res.comp = [e, px, py, pz];
-        res.init_pt2_phi_rap();
-        res
+        [e, px, py, pz].into()
     }
 }
+
+forward_ref_from!((N64, N64, N64, N64), PseudoJet);
 
 /// Create a pseudojet from the four-momentum components
 impl From<(f64, f64, f64, f64)> for PseudoJet {
@@ -183,6 +196,8 @@ impl From<(f64, f64, f64, f64)> for PseudoJet {
         [n64(e), n64(px), n64(py), n64(pz)].into()
     }
 }
+
+forward_ref_from!((f64, f64, f64, f64), PseudoJet);
 
 /// Create a pseudojet from the four-momentum components
 pub fn pseudojet(e: N64, px: N64, py: N64, pz: N64) -> PseudoJet {
