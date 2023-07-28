@@ -3,6 +3,7 @@ use crate::{distance::Distance, cluster_naive::ClusterNaive};
 use crate::pseudojet::PseudoJet;
 
 use std::cmp::Ord;
+use std::hash::Hash;
 
 use log::debug;
 
@@ -79,7 +80,7 @@ where &'a T: Into<PseudoJet>
 }
 
 /// Result of a clustering step
-#[derive(Clone, Debug, Ord, PartialOrd, Hash)]
+#[derive(Clone, Debug, Ord, PartialOrd)]
 pub enum ClusterStep {
     /// Two pseudojets were combined into a new pseudojet
     Combine([PseudoJet; 2]),
@@ -103,7 +104,7 @@ impl PartialEq for ClusterStep {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Combine(left), Self::Combine(right)) => left == right || (
-                (&left[0] == &right[1]) && (&left[1] == &right[0])
+                (left[0] == right[1]) && (left[1] == right[0])
             ),
             (Self::Jet(l0), Self::Jet(r0)) => l0 == r0,
             _ => false,
@@ -112,6 +113,22 @@ impl PartialEq for ClusterStep {
 }
 
 impl Eq for ClusterStep { }
+
+impl Hash for ClusterStep {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            ClusterStep::Combine([p1, p2]) => {
+                if p1 < p2 {
+                    [p1, p2].hash(state)
+                } else {
+                    [p2, p1].hash(state)
+                }
+            },
+            ClusterStep::Jet(p1) => p1.hash(state),
+        }
+    }
+}
+
 
 pub trait ClusterHist: Iterator<Item = ClusterStep>{}
 
