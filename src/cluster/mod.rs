@@ -1,7 +1,7 @@
 pub mod naive;
 pub mod geom;
+pub mod geom_tile;
 
-use crate::cluster::{naive::ClusterNaive, geom::ClusterGeom};
 use crate::distance::Distance;
 use crate::pseudojet::PseudoJet;
 
@@ -9,6 +9,8 @@ use std::cmp::Ord;
 use std::hash::Hash;
 
 use log::debug;
+
+use self::{naive::ClusterNaive, geom::ClusterGeom, geom_tile::ClusterGeomTile};
 
 /// Cluster `partons` into jets using the distance measure `d`
 #[deprecated = "Use `Cluster::cluster` instead"]
@@ -143,14 +145,18 @@ pub struct ClusterHistory<'a> (
 );
 
 impl<'a> ClusterHistory<'a> {
-    const NAIVE_THRESHOLD: usize = 24;
+    const START_GEOM_THRESHOLD: usize = 25;
+    const END_GEOM_THRESHOLD: usize = 49;
+    const START_TILE_THRESHOLD: usize = Self::END_GEOM_THRESHOLD + 1;
 
     /// Initialise clustering for the given `partons` and `distance`
     pub fn new<D: Distance + 'a>(partons: Vec<PseudoJet>, distance: D) -> Self {
-        let hist: Box<dyn ClusterHist> = if partons.len() > Self::NAIVE_THRESHOLD {
-            Box::new(ClusterGeom::new(partons, distance))
-        } else {
-            Box::new(ClusterNaive::new(partons, distance))
+        let hist: Box<dyn ClusterHist> = match partons.len() {
+            Self::START_TILE_THRESHOLD.. =>
+                Box::new(ClusterGeomTile::new(partons, distance)),
+            Self::START_GEOM_THRESHOLD..=Self::END_GEOM_THRESHOLD =>
+                Box::new(ClusterGeom::new(partons, distance)),
+            _ => Box::new(ClusterNaive::new(partons, distance))
         };
         Self(hist)
     }
