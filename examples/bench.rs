@@ -2,7 +2,7 @@ use std::{fs::File, time::Duration};
 
 use anyhow::Result;
 use cpu_time::ProcessTime;
-use jetty::{PseudoJet, anti_kt_f, cluster_if};
+use jetty::{PseudoJet, anti_kt_f, cluster::ClusterHistory, ClusterStep};
 
 fn main() -> Result<()> {
     let input = File::open("data/momenta_showered.rmp.zst")?;
@@ -16,11 +16,15 @@ fn main() -> Result<()> {
     pub const NEVENTS: usize = 10000;
     assert_eq!(NEVENTS, events.len()); // helps with optimisations
 
-    let algo = anti_kt_f(0.4);
     let start = ProcessTime::now();
     let njets: usize = events.into_iter()
-        .map(|ev| cluster_if(ev, &algo, |j| j.pt2() > 100.).len())
-        .sum();
+        .map(|ev| {
+            let cluster = ClusterHistory::new(ev, anti_kt_f(0.4));
+            cluster.filter(|s| match s {
+                ClusterStep::Jet(j) => j.pt2() > 100.,
+                ClusterStep::Combine(_) => false,
+            }).count()
+        }).sum();
     let cpu_time: Duration = start.elapsed();
     let avg_njets = njets as f64 / NEVENTS as f64;
     println!("Found {avg_njets:1} jets per event in {cpu_time:?}");
