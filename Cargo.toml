@@ -1,6 +1,6 @@
 [package]
 name = "jetty"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Andreas Maier <andreas.martin.maier@desy.de>"]
 edition = "2021"
 description = "Jet clustering"
@@ -10,7 +10,6 @@ keywords = ["physics", "jets"]
 categories = ["science"]
 repository = "https://github.com/a-maier/jetty"
 exclude = ["data", "examples/bench*"]
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 indexmap = "2.0"
