@@ -7,16 +7,16 @@
 //! - [kt](https://arxiv.org/abs/hep-ph/9305266)
 //! - Generalised kt.
 //!
-//! This crate uses a naive clustering implementation. For
-//! state-of-the-art implementations of many more jet algorithms, have a
-//! look at the excellent [fastjet](http://fastjet.fr/) library.
+//! For state-of-the-art implementations of many more jet algorithms,
+//! have a look at the excellent [fastjet](http://fastjet.fr/)
+//! library.
 //!
 //! # Examples
 //!
 //! Cluster a number of partons into jets using the anti-kt algorithm with radius 0.4:
 //!
 //! ```rust
-//! use jetty::{anti_kt_f, cluster, cluster_if, pseudojet_f};
+//! use jetty::{anti_kt_f, pseudojet_f, Cluster, ClusterHistory, ClusterStep};
 //!
 //! let partons = vec![
 //!     pseudojet_f(0.2626773221934335, -0.08809521946454194, -0.1141608706693822, -0.2195584284654444),
@@ -24,18 +24,25 @@
 //! ];
 //!
 //! // get all jets
-//! let all_jets = cluster(partons.clone(), &anti_kt_f(0.4));
+//! let all_jets = partons.clone().cluster(anti_kt_f(0.4));
 //! assert_eq!(all_jets.len(), 1);
 //!
 //! // get all jets with at least 40 GeV
-//! let jets_40gev = cluster_if(
-//!    partons.clone(),
-//!    &anti_kt_f(0.4),
+//! let jets_40gev = partons.cluster_if(
+//!    anti_kt_f(0.4),
 //!    |jet| jet.pt2() > 40. * 40.
 //! );
 //! assert_eq!(jets_40gev.len(), 0);
+//!
+//! // go through the cluster history step-by-step
+//! let history = ClusterHistory::new(partons, anti_kt_f(0.4));
+//! for step in history {
+//!    match step {
+//!       ClusterStep::Jet(j) => println!("Found a jet: {j:?}"),
+//!       ClusterStep::Combine(_j1, _j2) => println!("Combined two pseudojets"),
+//!    }
+//! }
 //! ```
-
 pub mod cluster;
 pub mod distance;
 pub mod pseudojet;
