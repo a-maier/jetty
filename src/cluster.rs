@@ -140,7 +140,7 @@ pub struct ClusterHistory<'a> (
 );
 
 impl<'a> ClusterHistory<'a> {
-    const NAIVE_THRESHOLD: usize = 20;
+    const NAIVE_THRESHOLD: usize = 24;
 
     /// Initialise clustering for the given `partons` and `distance`
     pub fn new<D: Distance + 'a>(partons: Vec<PseudoJet>, distance: D) -> Self {
