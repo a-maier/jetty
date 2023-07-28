@@ -1,5 +1,27 @@
+//!
+//! In general, it is recommended to use the general-purpose
+//! [ClusterHistory]. It chooses dynamically between the following
+//! specialised algorithms:
+//!
+//! * [ClusterNaive](crate::cluster::naive::ClusterNaive): choose this
+//!   algorithm if you know that the number of partons is not too big,
+//!   at most about 25. Also use this algorithm for custom distances
+//!   where the actual nearest neighbours are not always the nearest
+//!   neighbours in ΔR.
+//!
+//! * [ClusterGeom](crate::cluster::geom::ClusterGeom): the fastest
+//!   implemented algorithm for a number of partons roughly between 25
+//!   and 50.
+//!
+//! * [ClusterGeomTile](crate::cluster::geom_tile::ClusterGeomTile):
+//!   the fastest implemented algorithm for a large number of partons
+//!   starting at about 50.
+//!
+/// Naive clustering
 pub mod naive;
+/// Clustering using the geometric O(N^2) approach of [arXiv:0512210](https://arxiv.org/abs/hep-ph/0512210)
 pub mod geom;
+/// Clustering using the geometric O(N^2) approach of [arXiv:0512210](https://arxiv.org/abs/hep-ph/0512210) with tiling
 pub mod geom_tile;
 
 use crate::distance::Distance;
@@ -33,11 +55,12 @@ where
     partons.cluster_if(d, accept)
 }
 
+/// Objects that can be clustered into jets
 pub trait Cluster {
-    /// Cluster `partons` into jets using the distance measure `d`
+    /// Cluster into jets using the distance measure `d`
     fn cluster<D: Distance>(self, d: D) -> Vec<PseudoJet>;
 
-    /// Cluster `partons` into jets using the distance measure `d`
+    /// Cluster into jets using the distance measure `d`
     /// Only jets for which `accept` is true are returned
     fn cluster_if<D, F>(self, d: D, accept: F) -> Vec<PseudoJet>
     where
@@ -134,7 +157,7 @@ impl Hash for ClusterStep {
     }
 }
 
-
+/// Trait marking a clustering algorithm
 pub trait ClusterHist: Iterator<Item = ClusterStep>{}
 
 impl<T> ClusterHist for T where T: Iterator<Item = ClusterStep> { }

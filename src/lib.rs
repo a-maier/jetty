@@ -28,7 +28,7 @@
 //! assert_eq!(all_jets.len(), 1);
 //!
 //! // get all jets with at least 40 GeV
-//! let jets_40gev = partons.cluster_if(
+//! let jets_40gev = partons.clone().cluster_if(
 //!    anti_kt_f(0.4),
 //!    |jet| jet.pt2() > 40. * 40.
 //! );
@@ -39,12 +39,15 @@
 //! for step in history {
 //!    match step {
 //!       ClusterStep::Jet(j) => println!("Found a jet: {j:?}"),
-//!       ClusterStep::Combine(_j1, _j2) => println!("Combined two pseudojets"),
+//!       ClusterStep::Combine([_j1, _j2]) => println!("Combined two pseudojets"),
 //!    }
 //! }
 //! ```
+/// Jet clustering algorithms
 pub mod cluster;
+/// Distances and jet definitions
 pub mod distance;
+/// Pseudojets
 pub mod pseudojet;
 
 #[cfg(test)]
