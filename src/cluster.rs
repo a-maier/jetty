@@ -16,21 +16,64 @@ pub fn cluster<D: Distance>(partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet> {
 pub fn cluster_if<D, F>(
     partons: Vec<PseudoJet>,
     d: D,
-    mut accept: F,
+    accept: F,
 ) -> Vec<PseudoJet>
 where
     D: Distance,
     F: FnMut(PseudoJet) -> bool,
 {
-    debug!("clustering partons: {:#?}", partons);
-    let clustering = ClusterHistory::new(partons, d);
+    partons.cluster_if(d, accept)
+}
 
-    clustering
-        .filter_map(|s| match s {
-            ClusterStep::Jet(jet) if accept(jet) => Some(jet),
-            _ => None,
-        })
-        .collect()
+pub trait Cluster {
+    /// Cluster `partons` into jets using the distance measure `d`
+    fn cluster<D: Distance>(self, d: D) -> Vec<PseudoJet>;
+
+    /// Cluster `partons` into jets using the distance measure `d`
+    /// Only jets for which `accept` is true are returned
+    fn cluster_if<D, F>(self, d: D, accept: F) -> Vec<PseudoJet>
+    where
+        D: Distance,
+        F: FnMut(PseudoJet) -> bool;
+}
+
+impl Cluster for Vec<PseudoJet> {
+    fn cluster_if<D, F>(self, d: D, mut accept: F) -> Vec<PseudoJet>
+    where
+        D: Distance,
+        F: FnMut(PseudoJet) -> bool
+    {
+        debug!("clustering partons: {self:#?}");
+        let clustering = ClusterHistory::new(self, d);
+
+        clustering
+            .filter_map(|s| match s {
+                ClusterStep::Jet(jet) if accept(jet) => Some(jet),
+                _ => None,
+            })
+            .collect()
+    }
+
+    fn cluster<D: Distance>(self, d: D) -> Vec<PseudoJet> {
+        self.cluster_if(d, |_| true)
+    }
+}
+
+impl<'a, T> Cluster for &'a [T]
+where &'a T: Into<PseudoJet>
+{
+    fn cluster_if<D, F>(self, d: D, accept: F) -> Vec<PseudoJet>
+    where
+        D: Distance,
+        F: FnMut(PseudoJet) -> bool
+    {
+        let partons = Vec::from_iter(self.iter().map(|p| p.into()));
+        partons.cluster_if(d, accept)
+    }
+
+    fn cluster<D: Distance>(self, d: D) -> Vec<PseudoJet> {
+        self.cluster_if(d, |_| true)
+    }
 }
 
 /// Result of a clustering step
