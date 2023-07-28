@@ -1,5 +1,8 @@
-use crate::cluster_geom::ClusterGeom;
-use crate::{distance::Distance, cluster_naive::ClusterNaive};
+pub mod naive;
+pub mod geom;
+
+use crate::cluster::{naive::ClusterNaive, geom::ClusterGeom};
+use crate::distance::Distance;
 use crate::pseudojet::PseudoJet;
 
 use std::cmp::Ord;

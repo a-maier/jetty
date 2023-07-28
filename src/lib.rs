@@ -37,13 +37,11 @@
 //! ```
 
 pub mod cluster;
-pub mod cluster_geom;
 pub mod distance;
 pub mod pseudojet;
 
 #[cfg(test)]
 mod test_data;
-pub mod cluster_naive;
 
 #[allow(deprecated)]
 pub use cluster::{cluster, cluster_if};

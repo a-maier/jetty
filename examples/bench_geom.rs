@@ -2,7 +2,7 @@ use std::{fs::File, time::Duration};
 
 use anyhow::Result;
 use cpu_time::ProcessTime;
-use jetty::{PseudoJet, anti_kt_f, ClusterStep, cluster_geom::ClusterGeom};
+use jetty::{PseudoJet, anti_kt_f, ClusterStep, cluster::geom::ClusterGeom};
 
 fn main() -> Result<()> {
     let _ = env_logger::builder().is_test(true).try_init();

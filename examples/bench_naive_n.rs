@@ -2,7 +2,7 @@ use std::{fs::File, time::Duration};
 
 use anyhow::Result;
 use cpu_time::ProcessTime;
-use jetty::{PseudoJet, anti_kt_f, ClusterStep, cluster_naive::ClusterNaive};
+use jetty::{PseudoJet, anti_kt_f, ClusterStep, cluster::naive::ClusterNaive};
 
 fn main() -> Result<()> {
     let n = std::env::args().skip(1).next().unwrap().parse()?;

@@ -2,7 +2,7 @@ use std::{fs::File, time::Duration};
 
 use anyhow::Result;
 use cpu_time::ProcessTime;
-use jetty::{PseudoJet, anti_kt_f, ClusterStep, cluster_geom::ClusterGeom};
+use jetty::{PseudoJet, anti_kt_f, ClusterStep, cluster::geom::ClusterGeom};
 
 fn main() -> Result<()> {
     let n = std::env::args().skip(1).next().unwrap().parse()?;
