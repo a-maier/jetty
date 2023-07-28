@@ -17,7 +17,7 @@ pub fn cluster<D: Distance>(partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet> {
 #[deprecated = "Use `Cluster::cluster_if` instead"]
 pub fn cluster_if<D, F>(
     partons: Vec<PseudoJet>,
-    d: D,
+    d: &D,
     accept: F,
 ) -> Vec<PseudoJet>
 where
