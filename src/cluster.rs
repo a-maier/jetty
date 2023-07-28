@@ -7,12 +7,14 @@ use std::cmp::Ord;
 use log::debug;
 
 /// Cluster `partons` into jets using the distance measure `d`
+#[deprecated = "Use `Cluster::cluster` instead"]
 pub fn cluster<D: Distance>(partons: Vec<PseudoJet>, d: &D) -> Vec<PseudoJet> {
-    cluster_if(partons, d, |_| true)
+    partons.cluster_if(d, |_| true)
 }
 
 /// Cluster `partons` into jets using the distance measure `d`
 /// Only jets for which `accept` is true are returned
+#[deprecated = "Use `Cluster::cluster_if` instead"]
 pub fn cluster_if<D, F>(
     partons: Vec<PseudoJet>,
     d: D,

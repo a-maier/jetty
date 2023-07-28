@@ -45,7 +45,10 @@ pub mod pseudojet;
 mod test_data;
 pub mod cluster_naive;
 
-pub use cluster::{cluster, cluster_if, ClusterHistory, ClusterStep};
+#[allow(deprecated)]
+pub use cluster::{cluster, cluster_if};
+
+pub use cluster::{Cluster, ClusterHistory, ClusterStep};
 pub use distance::{anti_kt, cambridge_aachen, gen_kt, kt};
 pub use distance::{anti_kt_f, cambridge_aachen_f, gen_kt_f, kt_f};
 pub use pseudojet::{pseudojet, pseudojet_f, PseudoJet};
@@ -53,6 +56,7 @@ pub use pseudojet::{pseudojet, pseudojet_f, PseudoJet};
 #[cfg(test)]
 mod tests {
     use crate::test_data::*;
+    use super::{anti_kt_f, Cluster};
 
     fn log_init() {
         let _ = env_logger::builder().is_test(true).try_init();
@@ -62,10 +66,9 @@ mod tests {
     fn tst_cluster() {
         log_init();
 
-        use super::{anti_kt_f, cluster};
         let partons = partons_9_to_7();
 
-        let jets = cluster(partons, &anti_kt_f(0.4));
+        let jets = partons.cluster(anti_kt_f(0.4));
         assert_eq!(jets.len(), 7);
     }
 
@@ -73,10 +76,9 @@ mod tests {
     fn tst_cluster_none() {
         log_init();
 
-        use super::{anti_kt_f, cluster};
         let partons = partons_4_to_4();
 
-        let jets = cluster(partons, &anti_kt_f(0.4));
+        let jets = partons.cluster(anti_kt_f(0.4));
         assert_eq!(jets.len(), 4);
     }
 
@@ -84,16 +86,15 @@ mod tests {
     fn tst_cluster_both() {
         log_init();
 
-        use super::{anti_kt_f, cluster, cluster_if};
         let partons = partons_2_to_1();
 
         // get all jets
-        let all_jets = cluster(partons.clone(), &anti_kt_f(0.4));
+        let all_jets = partons.clone().cluster(anti_kt_f(0.4));
         assert_eq!(all_jets.len(), 1);
 
         // get all jets with at least 40 GeV
         let jets_40gev =
-            cluster_if(partons.clone(), &anti_kt_f(0.4), |jet| jet.pt2() > 20.);
+            partons.clone().cluster_if(anti_kt_f(0.4), |jet| jet.pt2() > 20.);
         assert_eq!(jets_40gev.len(), 0);
     }
 
@@ -101,10 +102,9 @@ mod tests {
     fn tst_cluster_3_to_2() {
         log_init();
 
-        use super::{anti_kt_f, cluster};
         let partons = partons_3_to_2();
 
-        let jets = cluster(partons, &anti_kt_f(0.4));
+        let jets = partons.cluster(anti_kt_f(0.4));
         assert_eq!(jets.len(), 2);
     }
 
@@ -112,10 +112,9 @@ mod tests {
     fn tst_cluster_8_to_7() {
         log_init();
 
-        use super::{anti_kt_f, cluster};
         let partons = partons_8_to_7();
 
-        let jets = cluster(partons, &anti_kt_f(0.4));
+        let jets = partons.cluster(anti_kt_f(0.4));
         assert_eq!(jets.len(), 7);
     }
 }
