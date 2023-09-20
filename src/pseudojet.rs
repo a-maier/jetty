@@ -52,6 +52,11 @@ impl PseudoJet {
         self.rap
     }
 
+    /// Inverse transverse momentum `inv_pt = 1/pt`
+    pub fn inv_pt(&self) -> N64 {
+        self.inv_pt2.sqrt()
+    }
+
     /// Inverse square of transverse momentum `inv_pt2 = 1/pt2`
     pub fn inv_pt2(&self) -> N64 {
         self.inv_pt2
@@ -60,6 +65,11 @@ impl PseudoJet {
     /// Square of transverse momentum `pt2 = px*px + py*py`
     pub fn pt2(&self) -> N64 {
         n64(1.) / self.inv_pt2
+    }
+
+    /// Absolute value of transverse momentum `pt = (px*px + py*py)^(1/2)`
+    pub fn pt(&self) -> N64 {
+        self.pt2().sqrt()
     }
 
     /// Calculate ΔR^2 = Δφ^2 + Δη^2
