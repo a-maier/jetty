@@ -74,23 +74,30 @@ impl<D: Distance> ClusterGeom<D> {
                 self.pseudojets[idx].nearest_neighbour_idx = i;
             }
 
-            assert!(nearest_i < self.pseudojets.len());
-            let to_update_idx  = self.pseudojets[nearest_i]
-                .nearest_neighbour_for
-                .iter()
-                .position(|&k| k == i)
-                .unwrap();
-            self.pseudojets[nearest_i]
-                .nearest_neighbour_for[to_update_idx] = j;
+            // for particles very close to the beam axis
+            // the distance to all others can be infinity
+            // within floating point precision
+            // in that case `nearest_i` will be `usize::MAX`
+            // (see `new`)
+            if nearest_i < self.pseudojets.len() {
+                let to_update_idx  = self.pseudojets[nearest_i]
+                    .nearest_neighbour_for
+                    .iter()
+                    .position(|&k| k == i)
+                    .unwrap();
+                self.pseudojets[nearest_i]
+                    .nearest_neighbour_for[to_update_idx] = j;
+            }
 
-            assert!(nearest_j < self.pseudojets.len());
-            let to_update_idx  = self.pseudojets[nearest_j]
-                .nearest_neighbour_for
-                .iter()
-                .position(|&k| k == j)
-                .unwrap();
-            self.pseudojets[nearest_j]
-                .nearest_neighbour_for[to_update_idx] = i;
+            if nearest_j < self.pseudojets.len() {
+                let to_update_idx  = self.pseudojets[nearest_j]
+                    .nearest_neighbour_for
+                    .iter()
+                    .position(|&k| k == j)
+                    .unwrap();
+                self.pseudojets[nearest_j]
+                    .nearest_neighbour_for[to_update_idx] = i;
+            }
 
             self.pseudojets.swap(i, j);
         }
