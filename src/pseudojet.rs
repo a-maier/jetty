@@ -52,6 +52,11 @@ impl PseudoJet {
         self.rap
     }
 
+    /// Rapidity y
+    pub fn y(&self) -> N64 {
+        self.rap
+    }
+
     /// Inverse transverse momentum `inv_pt = 1/pt`
     pub fn inv_pt(&self) -> N64 {
         self.inv_pt2.sqrt()
