@@ -47,7 +47,7 @@ impl PseudoJet {
         self.phi
     }
 
-    /// Rapidity η
+    /// Rapidity y
     pub fn rap(&self) -> N64 {
         self.rap
     }
@@ -72,12 +72,12 @@ impl PseudoJet {
         self.pt2().sqrt()
     }
 
-    /// Calculate ΔR^2 = Δφ^2 + Δη^2
+    /// Calculate ΔR^2 = Δφ^2 + Δy^2
     pub fn delta_r2(&self, p: &PseudoJet) -> N64 {
         self.delta_phi2(p) + self.delta_rap2(p)
     }
 
-    /// Calculate ΔR = (Δφ^2 + Δη^2)^(1/2)
+    /// Calculate ΔR = (Δφ^2 + Δy^2)^(1/2)
     pub fn delta_r(&self, p: &PseudoJet) -> N64 {
         self.delta_r2(p).sqrt()
     }
@@ -122,7 +122,7 @@ impl PseudoJet {
         drap * drap
     }
 
-    /// Difference Δη in rapidity
+    /// Difference Δy in rapidity
     pub fn delta_rap(&self, p: &PseudoJet) -> N64 {
         self.rap() - p.rap()
     }
