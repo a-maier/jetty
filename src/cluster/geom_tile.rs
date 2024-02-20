@@ -7,7 +7,7 @@ use log::{debug, trace};
 use noisy_float::prelude::*;
 use num_traits::cast::ToPrimitive;
 
-use crate::{PseudoJet, distance::Distance, ClusterStep};
+use crate::{distance::Distance, ClusterStep, PseudoJet};
 
 const MAX_RAP: f64 = 5.;
 const N_RAP_BINS: usize = 10;
@@ -24,9 +24,10 @@ pub struct ClusterGeomTile<D> {
 impl<D: Distance> ClusterGeomTile<D> {
     /// Initialise clustering for the given `partons` and `distance`
     pub fn new(partons: Vec<PseudoJet>, distance: D) -> Self {
-        let pseudojets = partons.into_iter().map(
-            |pseudojet| PseudoJetWithDist::new(pseudojet, &distance)
-        ).collect();
+        let pseudojets = partons
+            .into_iter()
+            .map(|pseudojet| PseudoJetWithDist::new(pseudojet, &distance))
+            .collect();
         let mut res = Self {
             pseudojets,
             distance,
@@ -38,7 +39,9 @@ impl<D: Distance> ClusterGeomTile<D> {
     }
 
     fn min_idx(&self) -> Option<usize> {
-        self.pseudojets.iter().enumerate()
+        self.pseudojets
+            .iter()
+            .enumerate()
             .min_by(|(_, a), (_, b)| a.cmp(b))
             .map(|(n, _)| n)
     }
@@ -48,12 +51,16 @@ impl<D: Distance> ClusterGeomTile<D> {
         assert!(i < self.pseudojets.len());
         assert!(j < self.pseudojets.len());
         if i != j {
-            let i_is_nearest_for = self.pseudojets[i].nearest_neighbour_for.clone();
+            let i_is_nearest_for =
+                self.pseudojets[i].nearest_neighbour_for.clone();
             let nearest_i = self.pseudojets[i].nearest_neighbour_idx;
-            let [rap_idx_i, phi_idx_i] = self.tile_coord(&self.pseudojets[i].pseudojet);
-            let j_is_nearest_for = self.pseudojets[j].nearest_neighbour_for.clone();
+            let [rap_idx_i, phi_idx_i] =
+                self.tile_coord(&self.pseudojets[i].pseudojet);
+            let j_is_nearest_for =
+                self.pseudojets[j].nearest_neighbour_for.clone();
             let nearest_j = self.pseudojets[j].nearest_neighbour_idx;
-            let [rap_idx_j, phi_idx_j] = self.tile_coord(&self.pseudojets[j].pseudojet);
+            let [rap_idx_j, phi_idx_j] =
+                self.tile_coord(&self.pseudojets[j].pseudojet);
 
             for idx in i_is_nearest_for {
                 debug_assert_eq!(self.pseudojets[idx].nearest_neighbour_idx, i);
@@ -65,23 +72,23 @@ impl<D: Distance> ClusterGeomTile<D> {
             }
 
             if nearest_i < self.pseudojets.len() {
-                let to_update_idx  = self.pseudojets[nearest_i]
+                let to_update_idx = self.pseudojets[nearest_i]
                     .nearest_neighbour_for
                     .iter()
                     .position(|&k| k == i)
                     .unwrap();
-                self.pseudojets[nearest_i]
-                    .nearest_neighbour_for[to_update_idx] = j;
+                self.pseudojets[nearest_i].nearest_neighbour_for
+                    [to_update_idx] = j;
             }
 
             if nearest_j < self.pseudojets.len() {
-                let to_update_idx  = self.pseudojets[nearest_j]
+                let to_update_idx = self.pseudojets[nearest_j]
                     .nearest_neighbour_for
                     .iter()
                     .position(|&k| k == j)
                     .unwrap();
-                self.pseudojets[nearest_j]
-                    .nearest_neighbour_for[to_update_idx] = i;
+                self.pseudojets[nearest_j].nearest_neighbour_for
+                    [to_update_idx] = i;
             }
 
             self.tiles[rap_idx_i][phi_idx_i].swap_remove(&i);
@@ -101,9 +108,8 @@ impl<D: Distance> ClusterGeomTile<D> {
         trace!("After swap: {:#?}", self.pseudojets);
 
         self.remove_nearest_link(self.pseudojets.len() - 1);
-        let [rap_idx, phi_idx] = self.tile_coord(
-            &self.pseudojets[self.pseudojets.len() - 1].pseudojet
-        );
+        let [rap_idx, phi_idx] = self
+            .tile_coord(&self.pseudojets[self.pseudojets.len() - 1].pseudojet);
         self.tiles[rap_idx][phi_idx].swap_remove(&(self.pseudojets.len() - 1));
         let pseudojet = self.pseudojets.pop().unwrap();
         // TODO: maybe don't recalculate nearest neighbours yet
@@ -122,15 +128,17 @@ impl<D: Distance> ClusterGeomTile<D> {
         assert!(pos < self.pseudojets.len());
         self.remove_nearest_link(pos);
 
-        let [rap_idx, phi_idx] = self.tile_coord(
-            &self.pseudojets[pos].pseudojet
-        );
-        let nearest_idx = self.tile_neighbours(rap_idx, phi_idx)
+        let [rap_idx, phi_idx] =
+            self.tile_coord(&self.pseudojets[pos].pseudojet);
+        let nearest_idx = self
+            .tile_neighbours(rap_idx, phi_idx)
             .filter(|&j| j != pos)
             .map(|idx| {
-                let gdist = self.pseudojets[pos].delta_r2(&self.pseudojets[idx]);
+                let gdist =
+                    self.pseudojets[pos].delta_r2(&self.pseudojets[idx]);
                 (gdist, idx)
-            }).min_by_key(|(d, _)| *d)
+            })
+            .min_by_key(|(d, _)| *d)
             .map(|(_d, idx)| idx)
             .unwrap_or(usize::MAX);
         debug_assert_ne!(nearest_idx, pos);
@@ -138,10 +146,8 @@ impl<D: Distance> ClusterGeomTile<D> {
         if nearest_idx < usize::MAX {
             assert!(nearest_idx < self.pseudojets.len());
             self.pseudojets[nearest_idx].nearest_neighbour_for.push(pos);
-            self.pseudojets[pos].nearest_dist = self.distance(
-                &self.pseudojets[pos],
-                &self.pseudojets[nearest_idx]
-            );
+            self.pseudojets[pos].nearest_dist = self
+                .distance(&self.pseudojets[pos], &self.pseudojets[nearest_idx]);
         } else {
             self.pseudojets[pos].nearest_dist = N64::max_value()
         }
@@ -162,7 +168,8 @@ impl<D: Distance> ClusterGeomTile<D> {
             }
             if d < self.pseudojets[n].nearest_dist {
                 self.remove_nearest_link(n);
-                self.pseudojets[n].nearest_neighbour_idx = self.pseudojets.len();
+                self.pseudojets[n].nearest_neighbour_idx =
+                    self.pseudojets.len();
                 pseudojet.nearest_neighbour_for.push(n);
             }
         }
@@ -171,10 +178,8 @@ impl<D: Distance> ClusterGeomTile<D> {
             let len = self.pseudojets.len();
             assert!(nearest_idx < len);
             self.pseudojets[nearest_idx].nearest_neighbour_for.push(len);
-            pseudojet.nearest_dist = self.distance(
-                &pseudojet,
-                &self.pseudojets[nearest_idx]
-            )
+            pseudojet.nearest_dist =
+                self.distance(&pseudojet, &self.pseudojets[nearest_idx])
         }
         self.tiles[rap_idx][phi_idx].insert(self.pseudojets.len());
         self.pseudojets.push(pseudojet);
@@ -187,7 +192,7 @@ impl<D: Distance> ClusterGeomTile<D> {
         assert!(pos < self.pseudojets.len());
         let nearest_idx = self.pseudojets[pos].nearest_neighbour_idx;
         if nearest_idx < self.pseudojets.len() {
-            let to_remove_idx  = self.pseudojets[nearest_idx]
+            let to_remove_idx = self.pseudojets[nearest_idx]
                 .nearest_neighbour_for
                 .iter()
                 .position(|&j| j == pos)
@@ -222,7 +227,7 @@ impl<D: Distance> ClusterGeomTile<D> {
     fn tile_neighbours(
         &self,
         rap_idx: usize,
-        phi_idx: usize
+        phi_idx: usize,
     ) -> impl Iterator<Item = usize> + '_ {
         let rap_idx_range = match rap_idx + 1 {
             1 => 0..2,
@@ -230,29 +235,34 @@ impl<D: Distance> ClusterGeomTile<D> {
             _ => (rap_idx - 1)..(rap_idx + 2),
         };
         let phi_idx_range = match phi_idx + 1 {
-            1 => [N_PHI_BINS - 1, 0 , 1],
-            N_PHI_BINS => [N_PHI_BINS - 2, N_PHI_BINS - 1 , 0],
-            _ => [phi_idx - 1, phi_idx, phi_idx + 1]
+            1 => [N_PHI_BINS - 1, 0, 1],
+            N_PHI_BINS => [N_PHI_BINS - 2, N_PHI_BINS - 1, 0],
+            _ => [phi_idx - 1, phi_idx, phi_idx + 1],
         };
-        rap_idx_range.cartesian_product(phi_idx_range)
+        rap_idx_range
+            .cartesian_product(phi_idx_range)
             .flat_map(|(rap, phi)| self.tiles[rap][phi].iter().copied())
     }
 
-    fn init_nearest(&mut self)  {
+    fn init_nearest(&mut self) {
         for i in 0..self.pseudojets.len() {
-            let [rap_idx, phi_idx] = self.tile_coord(&self.pseudojets[i].pseudojet);
-            let nearest = self.tile_neighbours(rap_idx, phi_idx)
+            let [rap_idx, phi_idx] =
+                self.tile_coord(&self.pseudojets[i].pseudojet);
+            let nearest = self
+                .tile_neighbours(rap_idx, phi_idx)
                 .filter(|&j| i != j)
                 .map(|j| {
-                    let gdist = self.pseudojets[i].delta_r2(&self.pseudojets[j]);
+                    let gdist =
+                        self.pseudojets[i].delta_r2(&self.pseudojets[j]);
                     (gdist, j)
-                }).min();
+                })
+                .min();
             if let Some((_, nearest_idx)) = nearest {
                 assert!(nearest_idx < self.pseudojets.len());
                 self.pseudojets[i].nearest_neighbour_idx = nearest_idx;
                 self.pseudojets[i].nearest_dist = self.distance(
                     &self.pseudojets[i],
-                    &self.pseudojets[nearest_idx]
+                    &self.pseudojets[nearest_idx],
                 );
                 self.pseudojets[nearest_idx].nearest_neighbour_for.push(i);
             }
@@ -321,7 +331,6 @@ impl PseudoJetWithDist {
     fn delta_r2(&self, p: &PseudoJetWithDist) -> N64 {
         self.pseudojet.delta_r2(&p.pseudojet)
     }
-
 }
 
 impl PartialOrd for PseudoJetWithDist {
@@ -338,7 +347,7 @@ impl Ord for PseudoJetWithDist {
 
 #[cfg(test)]
 mod tests {
-    use crate::{test_data::*, cluster::naive::ClusterNaive, anti_kt_f};
+    use crate::{anti_kt_f, cluster::naive::ClusterNaive, test_data::*};
 
     use super::*;
 

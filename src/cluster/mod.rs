@@ -17,12 +17,12 @@
 //!   the fastest implemented algorithm for a large number of partons
 //!   starting at about 50.
 //!
-/// Naive clustering
-pub mod naive;
 /// Clustering using the geometric O(N^2) approach of [arXiv:0512210](https://arxiv.org/abs/hep-ph/0512210)
 pub mod geom;
 /// Clustering using the geometric O(N^2) approach of [arXiv:0512210](https://arxiv.org/abs/hep-ph/0512210) with tiling
 pub mod geom_tile;
+/// Naive clustering
+pub mod naive;
 
 use crate::distance::Distance;
 use crate::pseudojet::PseudoJet;
@@ -32,7 +32,9 @@ use std::hash::Hash;
 
 use log::debug;
 
-use self::{naive::ClusterNaive, geom::ClusterGeom, geom_tile::ClusterGeomTile};
+use self::{
+    geom::ClusterGeom, geom_tile::ClusterGeomTile, naive::ClusterNaive,
+};
 
 /// Cluster `partons` into jets using the distance measure `d`
 #[deprecated = "Use `Cluster::cluster` instead"]
@@ -72,7 +74,7 @@ impl Cluster for Vec<PseudoJet> {
     fn cluster_if<D, F>(self, d: D, mut accept: F) -> Vec<PseudoJet>
     where
         D: Distance,
-        F: FnMut(PseudoJet) -> bool
+        F: FnMut(PseudoJet) -> bool,
     {
         debug!("clustering partons: {self:#?}");
         let clustering = ClusterHistory::new(self, d);
@@ -91,12 +93,13 @@ impl Cluster for Vec<PseudoJet> {
 }
 
 impl<'a, T> Cluster for &'a [T]
-where &'a T: Into<PseudoJet>
+where
+    &'a T: Into<PseudoJet>,
 {
     fn cluster_if<D, F>(self, d: D, accept: F) -> Vec<PseudoJet>
     where
         D: Distance,
-        F: FnMut(PseudoJet) -> bool
+        F: FnMut(PseudoJet) -> bool,
     {
         let partons = Vec::from_iter(self.iter().map(|p| p.into()));
         partons.cluster_if(d, accept)
@@ -131,16 +134,17 @@ impl From<PseudoJet> for ClusterStep {
 impl PartialEq for ClusterStep {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::Combine(left), Self::Combine(right)) => left == right || (
-                (left[0] == right[1]) && (left[1] == right[0])
-            ),
+            (Self::Combine(left), Self::Combine(right)) => {
+                left == right
+                    || ((left[0] == right[1]) && (left[1] == right[0]))
+            }
             (Self::Jet(l0), Self::Jet(r0)) => l0 == r0,
             _ => false,
         }
     }
 }
 
-impl Eq for ClusterStep { }
+impl Eq for ClusterStep {}
 
 impl Hash for ClusterStep {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -151,21 +155,19 @@ impl Hash for ClusterStep {
                 } else {
                     [p2, p1].hash(state)
                 }
-            },
+            }
             ClusterStep::Jet(p1) => p1.hash(state),
         }
     }
 }
 
 /// Trait marking a clustering algorithm
-pub trait ClusterHist: Iterator<Item = ClusterStep>{}
+pub trait ClusterHist: Iterator<Item = ClusterStep> {}
 
-impl<T> ClusterHist for T where T: Iterator<Item = ClusterStep> { }
+impl<T> ClusterHist for T where T: Iterator<Item = ClusterStep> {}
 
 /// General-purpose cluster history
-pub struct ClusterHistory<'a> (
-    Box<dyn ClusterHist + 'a>
-);
+pub struct ClusterHistory<'a>(Box<dyn ClusterHist + 'a>);
 
 impl<'a> ClusterHistory<'a> {
     const START_GEOM_THRESHOLD: usize = 25;
@@ -175,11 +177,13 @@ impl<'a> ClusterHistory<'a> {
     /// Initialise clustering for the given `partons` and `distance`
     pub fn new<D: Distance + 'a>(partons: Vec<PseudoJet>, distance: D) -> Self {
         let hist: Box<dyn ClusterHist> = match partons.len() {
-            Self::START_TILE_THRESHOLD.. =>
-                Box::new(ClusterGeomTile::new(partons, distance)),
-            Self::START_GEOM_THRESHOLD..=Self::END_GEOM_THRESHOLD =>
-                Box::new(ClusterGeom::new(partons, distance)),
-            _ => Box::new(ClusterNaive::new(partons, distance))
+            Self::START_TILE_THRESHOLD.. => {
+                Box::new(ClusterGeomTile::new(partons, distance))
+            }
+            Self::START_GEOM_THRESHOLD..=Self::END_GEOM_THRESHOLD => {
+                Box::new(ClusterGeom::new(partons, distance))
+            }
+            _ => Box::new(ClusterNaive::new(partons, distance)),
         };
         Self(hist)
     }

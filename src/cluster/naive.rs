@@ -1,7 +1,7 @@
 use log::{debug, trace};
 use noisy_float::types::N64;
 
-use crate::{PseudoJet, distance::Distance, ClusterStep};
+use crate::{distance::Distance, ClusterStep, PseudoJet};
 
 /// Cluster history using naive brute-force nearest-neighbour search
 #[derive(Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]

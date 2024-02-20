@@ -156,7 +156,6 @@ impl PseudoJet {
             ((e + pz) / (e - pz)).ln() / 2.
         }
     }
-
 }
 
 macro_rules! forward_ref_from {

@@ -101,7 +101,8 @@ pub fn gen_kt_f(r: f64, p: f64) -> GenKt {
 
 impl Distance for GenKt {
     fn distance(&self, p1: &PseudoJet, p2: &PseudoJet) -> N64 {
-        min(p1.pt2().powf(self.p), p2.pt2().powf(self.p)) * p1.delta_r2(p2) / self.r2
+        min(p1.pt2().powf(self.p), p2.pt2().powf(self.p)) * p1.delta_r2(p2)
+            / self.r2
     }
 
     fn beam_distance(&self, p1: &PseudoJet) -> N64 {

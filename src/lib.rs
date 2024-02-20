@@ -63,8 +63,8 @@ pub use pseudojet::{pseudojet, pseudojet_f, PseudoJet};
 
 #[cfg(test)]
 mod tests {
-    use crate::test_data::*;
     use super::{anti_kt_f, Cluster};
+    use crate::test_data::*;
 
     fn log_init() {
         let _ = env_logger::builder().is_test(true).try_init();
@@ -101,8 +101,9 @@ mod tests {
         assert_eq!(all_jets.len(), 1);
 
         // get all jets with at least 40 GeV
-        let jets_40gev =
-            partons.clone().cluster_if(anti_kt_f(0.4), |jet| jet.pt2() > 20.);
+        let jets_40gev = partons
+            .clone()
+            .cluster_if(anti_kt_f(0.4), |jet| jet.pt2() > 20.);
         assert_eq!(jets_40gev.len(), 0);
     }
 

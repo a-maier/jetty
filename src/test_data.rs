@@ -1,4 +1,4 @@
-use crate::{PseudoJet, pseudojet_f};
+use crate::{pseudojet_f, PseudoJet};
 
 pub(crate) fn partons_9_to_7() -> Vec<PseudoJet> {
     vec![
