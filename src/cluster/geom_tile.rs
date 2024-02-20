@@ -266,9 +266,7 @@ impl<D: Distance> Iterator for ClusterGeomTile<D> {
     /// Perform the next clustering step
     fn next(&mut self) -> Option<Self::Item> {
         trace!("pseudojets: {:#?}", self.pseudojets);
-        let Some(i) = self.min_idx() else {
-            return None
-        };
+        let i = self.min_idx()?;
         let pi = self.remove(i);
         if pi.beam_dist < pi.nearest_dist {
             let pi = pi.pseudojet;
@@ -328,7 +326,7 @@ impl PseudoJetWithDist {
 
 impl PartialOrd for PseudoJetWithDist {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.min_dist().partial_cmp(&other.min_dist())
+        Some(self.cmp(other))
     }
 }
 
