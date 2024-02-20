@@ -12,8 +12,8 @@ repository = "https://github.com/a-maier/jetty"
 exclude = ["data", "examples/bench*"]
 
 [dependencies]
-indexmap = "2.0"
-itertools = "0.11"
+indexmap = "2.2"
+itertools = "0.12"
 log = "0.4"
 noisy_float = "0.2"
 num-traits = "0.2"
@@ -21,6 +21,6 @@ num-traits = "0.2"
 [dev-dependencies]
 anyhow = "1.0"
 cpu-time = "1.0"
-env_logger = "0.10"
+env_logger = "0.11"
 rmp-serde = "1.1"
-zstd = "0.12"
+zstd = "0.13"

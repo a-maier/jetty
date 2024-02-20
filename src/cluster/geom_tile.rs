@@ -84,9 +84,9 @@ impl<D: Distance> ClusterGeomTile<D> {
                     .nearest_neighbour_for[to_update_idx] = i;
             }
 
-            self.tiles[rap_idx_i][phi_idx_i].remove(&i);
+            self.tiles[rap_idx_i][phi_idx_i].swap_remove(&i);
             self.tiles[rap_idx_i][phi_idx_i].insert(j);
-            self.tiles[rap_idx_j][phi_idx_j].remove(&j);
+            self.tiles[rap_idx_j][phi_idx_j].swap_remove(&j);
             self.tiles[rap_idx_j][phi_idx_j].insert(i);
 
             self.pseudojets.swap(i, j);
@@ -104,7 +104,7 @@ impl<D: Distance> ClusterGeomTile<D> {
         let [rap_idx, phi_idx] = self.tile_coord(
             &self.pseudojets[self.pseudojets.len() - 1].pseudojet
         );
-        self.tiles[rap_idx][phi_idx].remove(&(self.pseudojets.len() - 1));
+        self.tiles[rap_idx][phi_idx].swap_remove(&(self.pseudojets.len() - 1));
         let pseudojet = self.pseudojets.pop().unwrap();
         // TODO: maybe don't recalculate nearest neighbours yet
         self.update_nearest(&pseudojet.nearest_neighbour_for);
