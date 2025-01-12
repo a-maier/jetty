@@ -5,7 +5,7 @@ use cpu_time::ProcessTime;
 use jetty::{anti_kt_f, cluster::ClusterHistory, ClusterStep, PseudoJet};
 
 fn main() -> Result<()> {
-    let n = std::env::args().skip(1).next().unwrap().parse()?;
+    let n = std::env::args().nth(1).unwrap().parse()?;
     let input = File::open("data/momenta_showered.rmp.zst")?;
     let mut events = Vec::new();
     zstd::stream::copy_decode(input, &mut events).unwrap();

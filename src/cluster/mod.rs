@@ -189,7 +189,7 @@ impl<'a> ClusterHistory<'a> {
     }
 }
 
-impl<'a> Iterator for ClusterHistory<'a> {
+impl Iterator for ClusterHistory<'_> {
     type Item = ClusterStep;
 
     /// Perform the next clustering step
