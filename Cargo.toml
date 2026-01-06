@@ -2,7 +2,7 @@
 name = "jetty"
 version = "0.4.1"
 authors = ["Andreas Maier <amaier@ifae.es>"]
-edition = "2021"
+edition = "2024"
 description = "Jet clustering"
 readme = "Readme.md"
 license = "GPL-3.0-or-later"
